@@ -25,14 +25,14 @@ const SentenceDisplay: React.FC<SentenceDisplayProps> = ({
               className={`
                 inline-block min-w-24 border-b-2 mx-1 px-2 text-center
                 ${filledAnswers[index] 
-                  ? 'border-[#9b87f5]/70 cursor-pointer' 
+                  ? 'border-indigo-500 text-indigo-700 cursor-pointer' 
                   : 'border-gray-300'
                 }
               `}
               onClick={() => filledAnswers[index] !== null && onBlankClick(index)}
             >
               {filledAnswers[index] ? (
-                <span className="py-1 px-2 inline-block bg-[#9b87f5]/10 rounded-md text-[#9b87f5] font-medium">
+                <span className="py-1 px-2 inline-block bg-indigo-50 rounded-md">
                   {filledAnswers[index]}
                 </span>
               ) : (

@@ -149,7 +149,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           variant="outline"
           size="sm"
           onClick={onQuit}
-          className="text-gray-600 hover:bg-gray-50"
+          className="text-gray-600"
         >
           Quit
         </Button>
@@ -168,8 +168,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
         ))}
       </div>
       
-      <h2 className="text-gray-600 text-center mb-8">
-        Select the missing words in the correct order
+      <h2 className="text-gray-600 text-center mb-6">
+        Fill in the blanks with the correct words
       </h2>
       
       <SentenceDisplay 
@@ -178,7 +178,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
         onBlankClick={handleBlankClick}
       />
       
-      <div className="flex flex-wrap gap-3 justify-center mb-10">
+      <div className="flex flex-wrap gap-3 justify-center mb-8">
         {availableOptions.map((word, index) => (
           <Word
             key={word}
@@ -192,12 +192,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       <div className="flex justify-end">
         <Button 
           onClick={handleNext}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full aspect-square p-0 h-12 w-12 flex items-center justify-center"
           disabled={!allBlanksFilled}
-          className={`rounded-lg w-12 h-12 p-0 ${
-            allBlanksFilled 
-              ? 'bg-[#9b87f5] hover:bg-[#7E69AB] text-white' 
-              : 'bg-gray-100 text-gray-400'
-          }`}
         >
           <ArrowRight className="w-5 h-5" />
         </Button>
