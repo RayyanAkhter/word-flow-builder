@@ -32,7 +32,7 @@ const SentenceDisplay: React.FC<SentenceDisplayProps> = ({
               onClick={() => filledAnswers[index] !== null && onBlankClick(index)}
             >
               {filledAnswers[index] ? (
-                <span className="py-1 px-2 inline-block bg-gray-50 rounded-md border border-gray-200">
+                <span className="py-1 px-2 inline-block bg-indigo-50 rounded-md">
                   {filledAnswers[index]}
                 </span>
               ) : (

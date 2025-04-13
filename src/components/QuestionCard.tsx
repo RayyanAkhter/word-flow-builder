@@ -31,9 +31,14 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     Array(blankCount).fill(null)
   );
   
-  // Track which options have been selected
-  const [selectedOptions, setSelectedOptions] = useState<boolean[]>(
-    Array(question.options.length).fill(false)
+  // Track available options (we'll remove selected ones)
+  const [availableOptions, setAvailableOptions] = useState<string[]>(
+    [...question.options]
+  );
+  
+  // Track which blank index each word is placed in
+  const [wordPlacement, setWordPlacement] = useState<Record<string, number | null>>(
+    Object.fromEntries(question.options.map(word => [word, null]))
   );
   
   // Track if timer is active
@@ -42,31 +47,35 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   // Reset state when question changes
   useEffect(() => {
     setFilledAnswers(Array(blankCount).fill(null));
-    setSelectedOptions(Array(question.options.length).fill(false));
+    setAvailableOptions([...question.options]);
+    setWordPlacement(
+      Object.fromEntries(question.options.map(word => [word, null]))
+    );
     setIsTimerActive(true);
   }, [question, blankCount]);
 
   // Handle clicking on a word option
-  const handleWordClick = (word: string, optionIndex: number) => {
-    // If already selected, do nothing
-    if (selectedOptions[optionIndex]) return;
-    
+  const handleWordClick = (word: string) => {
     // Find the first empty blank
     const emptyIndex = filledAnswers.findIndex(answer => answer === null);
     
     if (emptyIndex !== -1) {
       // Create a copy of the arrays to update
       const newFilledAnswers = [...filledAnswers];
-      const newSelectedOptions = [...selectedOptions];
       
       // Set the word in the first empty blank
       newFilledAnswers[emptyIndex] = word;
       
-      // Mark this option as selected
-      newSelectedOptions[optionIndex] = true;
+      // Update word placement
+      setWordPlacement(prev => ({
+        ...prev,
+        [word]: emptyIndex
+      }));
+      
+      // Remove word from available options
+      setAvailableOptions(prev => prev.filter(option => option !== word));
       
       setFilledAnswers(newFilledAnswers);
-      setSelectedOptions(newSelectedOptions);
     }
   };
 
@@ -75,25 +84,27 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     // If blank is empty, do nothing
     if (filledAnswers[blankIndex] === null) return;
     
-    // Find the option index for this word
-    const optionIndex = question.options.findIndex(
-      option => option === filledAnswers[blankIndex]
-    );
+    // Get the word in the blank
+    const word = filledAnswers[blankIndex];
     
-    // Create a copy of the arrays to update
-    const newFilledAnswers = [...filledAnswers];
-    const newSelectedOptions = [...selectedOptions];
-    
-    // Clear the blank
-    newFilledAnswers[blankIndex] = null;
-    
-    // Mark the option as unselected if we found it
-    if (optionIndex !== -1) {
-      newSelectedOptions[optionIndex] = false;
+    if (word) {
+      // Create a copy of the arrays to update
+      const newFilledAnswers = [...filledAnswers];
+      
+      // Clear the blank
+      newFilledAnswers[blankIndex] = null;
+      
+      // Add the word back to available options
+      setAvailableOptions(prev => [...prev, word]);
+      
+      // Update word placement
+      setWordPlacement(prev => ({
+        ...prev,
+        [word]: null
+      }));
+      
+      setFilledAnswers(newFilledAnswers);
     }
-    
-    setFilledAnswers(newFilledAnswers);
-    setSelectedOptions(newSelectedOptions);
   };
 
   // Check if all blanks are filled
@@ -168,12 +179,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       />
       
       <div className="flex flex-wrap gap-3 justify-center mb-8">
-        {question.options.map((word, index) => (
+        {availableOptions.map((word, index) => (
           <Word
-            key={index}
+            key={word}
             word={word}
-            isSelected={selectedOptions[index]}
-            onClick={() => handleWordClick(word, index)}
+            isSelected={false}
+            onClick={() => handleWordClick(word)}
           />
         ))}
       </div>
@@ -181,10 +192,10 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       <div className="flex justify-end">
         <Button 
           onClick={handleNext}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full aspect-square p-0 h-12 w-12 flex items-center justify-center"
+          disabled={!allBlanksFilled}
         >
-          <span className="mr-2">Next</span>
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-5 h-5" />
         </Button>
       </div>
     </div>
